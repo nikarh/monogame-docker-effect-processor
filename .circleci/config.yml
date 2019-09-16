@@ -5,11 +5,11 @@ jobs:
       - image: mcr.microsoft.com/dotnet/core/sdk:2.2-alpine
     steps:
       - checkout
-      - run: dotnet build -c Release
+      - run: dotnet publish -c Release --framework netstandard2.0
       - persist_to_workspace:
-          root: .
+          root: bin/Release/netstandard2.0/
           paths:
-            - bin/Release/netstandard2.0/DockerEffectProcessor.dll
+            - DockerEffectProcessor.dll
   publish:
     docker:
       - image: cibuilds/github:0.12
