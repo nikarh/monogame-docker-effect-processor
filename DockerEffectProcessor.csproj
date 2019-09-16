@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net472</TargetFrameworks>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+        <RootNamespace>Processor</RootNamespace>
+    </PropertyGroup>
+
+    <Import Project="./Mono.props" />
+    
+    <ItemGroup>
+        <Reference Include="netstandard" />
+        <PackageReference Include="MonoGame.Framework.Content.Pipeline.Portable" Version="3.7.1.189" />
+    </ItemGroup>
+</Project>

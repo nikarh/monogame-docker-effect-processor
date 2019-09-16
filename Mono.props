@@ -1,0 +1,34 @@
+﻿<Project>
+    <!-- Mono -->
+    <PropertyGroup>
+        <TargetIsMono Condition="$(TargetFramework.StartsWith('net4')) and '$(OS)' == 'Unix'">true</TargetIsMono>
+
+        <!-- Look in the standard install locations -->
+        <MonoPath Condition="'$(MonoPath)' == '' AND '$(TargetIsMono)' == 'true' AND EXISTS('/Library/Frameworks/Mono.framework/Versions/Current/lib/mono')">/Library/Frameworks/Mono.framework/Versions/Current/lib/mono</MonoPath>
+        <MonoPath Condition="'$(MonoPath)' == '' AND '$(TargetIsMono)' == 'true' AND EXISTS('/usr/lib/mono')">/usr/lib/mono</MonoPath>
+        <MonoPath Condition="'$(MonoPath)' == '' AND '$(TargetIsMono)' == 'true' AND EXISTS('/usr/local/lib/mono')">/usr/local/lib/mono</MonoPath>
+
+        <!-- If we found Mono reference assemblies, then use them -->
+        <FrameworkPathOverride Condition="'$(MonoPath)' != '' AND $(TargetFramework.StartsWith('net4'))">$(MonoPath)/4.7.1-api</FrameworkPathOverride>
+        <EnableFrameworkPathOverride Condition="'$(MonoPath)' != ''">true</EnableFrameworkPathOverride>
+
+        <!-- Facades contain netstandard.dll -->
+        <AssemblySearchPaths Condition="'$(MonoPath)' != ''">$(FrameworkPathOverride)/Facades;$(AssemblySearchPaths)</AssemblySearchPaths>
+    </PropertyGroup>
+
+    <!-- Sdk.target provides us with $(RunCommand) and $(RunArguments) -->
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="'$(TargetIsMono)' == 'true'" />
+    
+    <PropertyGroup Condition="'$(TargetIsMono)' == 'true'">
+        <RunArguments>$(RunCommand) $(RunArguments)</RunArguments>
+        <RunCommand>mono</RunCommand>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(TargetIsMono)' == 'true'">
+        <Reference Include="System" />
+        <Reference Include="Microsoft.CSharp" />
+        <Reference Include="System.Runtime" />
+        <Reference Include="System.IO" />
+        <Reference Include="System.Collections" />
+    </ItemGroup>
+</Project>
