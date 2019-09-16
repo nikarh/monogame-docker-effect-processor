@@ -1,0 +1,46 @@
+﻿version: 2
+jobs:
+  build:
+    docker:
+      - image: mcr.microsoft.com/dotnet/core/sdk:2.2-alpine
+    steps:
+      - checkout
+      - run: dotnet build -c Release
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bin/Release/netstandard2.0/DockerEffectProcessor.dll
+  publish:
+    docker:
+      - image: cibuilds/github:0.12
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} \
+              -r ${CIRCLE_PROJECT_REPONAME} \
+              -c ${CIRCLE_SHA1} \
+              -delete ${CIRCLE_TAG} ./artifacts/
+workflows:
+  version: 2
+  default:
+    jobs:
+      - build:
+          pre-steps:
+            - run:
+                name: "Install git and SSH client"
+                command: |
+                  apk add --update --no-progress git openssh-client
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
+      - publish:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*(-.*)*/
