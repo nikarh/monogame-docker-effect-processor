@@ -2,12 +2,12 @@
 jobs:
   build:
     docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:2.2-alpine
+      - image: mono
     steps:
       - checkout
-      - run: dotnet publish -c Release --framework netstandard2.0
+      - run: msbuild -Restore:true /p:Configuration=Release DockerEffectProcessor.csproj
       - persist_to_workspace:
-          root: bin/Release/netstandard2.0/
+          root: bin/Release/net472/
           paths:
             - DockerEffectProcessor.dll
   publish:
@@ -32,7 +32,7 @@ workflows:
             - run:
                 name: "Install git and SSH client"
                 command: |
-                  apk add --update --no-progress git openssh-client
+                  apt-get update && apt-get install -y git openssh-client
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*(-.*)*/
